@@ -49,7 +49,7 @@ export function Users() {
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Users</h2>
+        <h2 className="text-xl font-semibold">User Management</h2>
         <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
           <DialogTrigger asChild>
             <Button>

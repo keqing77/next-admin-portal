@@ -1,47 +1,30 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import { Card, AreaChart, Title } from "@tremor/react";
 
 const data = [
-  { name: "Homepage", time: 120 },
-  { name: "Login", time: 80 },
-  { name: "Dashboard", time: 200 },
-  { name: "Profile", time: 150 },
-  { name: "Settings", time: 100 },
+  {
+    date: "2024-01-01",
+    "Response Time": 250,
+  },
+  // ... 添加更多数据点
 ];
 
 export default function RequestTimeChart() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Request Time (ms)</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ChartContainer
-          config={{
-            time: {
-              label: "Request Time (ms)",
-              color: "hsl(var(--chart-3))",
-            },
-          }}
-          className="h-[300px]"
-        >
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Bar dataKey="time" fill="var(--color-time)" />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartContainer>
-      </CardContent>
-    </Card>
+    <div className="w-full overflow-x-auto">
+      <AreaChart
+        className="h-72 min-w-[400px]"
+        data={data}
+        index="date"
+        categories={["Response Time"]}
+        colors={["blue"]}
+        valueFormatter={(value) => `${value}ms`}
+        yAxisWidth={40}
+        showAnimation={true}
+        showLegend={false}
+        showGridLines={false}
+      />
+    </div>
   );
 }

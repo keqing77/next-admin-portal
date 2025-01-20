@@ -96,8 +96,8 @@ const data = {
       icon: Home,
     },
     {
-      title: "Model Performance",
-      url: "/dashboard/analytics",
+      title: "Functional Metrics",
+      url: "/dashboard/metrics",
       icon: Bot,
     },
     {
@@ -111,14 +111,6 @@ const data = {
       icon: SquareTerminal,
       isActive: true,
       items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Active",
-          url: "#",
-        },
         {
           title: "Prompts management",
           url: "/dashboard/prompts",
