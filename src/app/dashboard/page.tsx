@@ -41,6 +41,10 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from "recharts";
+import { ChartLine } from "@/components/shared/chart-line";
+import { ChartBar } from "@/components/shared/chart-bar";
+import { ChartArea } from "@/components/shared/chart-area";
+import { ChartPie } from "@/components/shared/chart-pie";
 
 const statsCards = [
   {
@@ -286,6 +290,13 @@ export default function DashboardPage() {
             </ResponsiveContainer>
           </CardContent>
         </Card>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-4xl">
+          <ChartLine />
+          <ChartBar />
+          <ChartArea />
+          <ChartPie />
+        </div>
       </div>
     </div>
   );
