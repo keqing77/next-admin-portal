@@ -28,23 +28,16 @@ import {
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { addDays } from "date-fns";
 import { useState } from "react";
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  ReferenceLine,
-} from "recharts";
 import { ChartLine } from "@/components/shared/chart-line";
 import { ChartBar } from "@/components/shared/chart-bar";
 import { ChartArea } from "@/components/shared/chart-area";
 import { ChartPie } from "@/components/shared/chart-pie";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const statsCards = [
   {
@@ -85,36 +78,6 @@ const statsCards = [
   },
 ];
 
-// Add sample data for charts
-const modelEvaluationData = [
-  { date: "2024-03-01", accuracy: 85, completeness: 82, hallucination: 8 },
-  { date: "2024-03-02", accuracy: 88, completeness: 85, hallucination: 7 },
-  { date: "2024-03-03", accuracy: 82, completeness: 78, hallucination: 12 },
-  // ... more data
-];
-
-const responseTimeData = [
-  { date: "2024-03-01", time: 1200 },
-  { date: "2024-03-02", time: 1100 },
-  { date: "2024-03-03", time: 1500 },
-  // ... more data
-];
-
-const costData = [
-  { date: "2024-03-01", cost: 250 },
-  { date: "2024-03-02", cost: 300 },
-  { date: "2024-03-03", cost: 280 },
-  // ... more data
-];
-
-const requestData = [
-  { date: "2024-03-01", requests: 150 },
-  { date: "2024-03-02", requests: 180 },
-  { date: "2024-03-03", requests: 200 },
-  // ... more data
-];
-
-// Add these constants near the top of the file, after other constants
 const countries = [
   { value: "HK", label: "Hong Kong" },
   { value: "UK", label: "United Kingdom" },
@@ -136,8 +99,14 @@ export default function DashboardPage() {
   });
 
   // Add these state variables after the date state
-  const [selectedCountry, setSelectedCountry] = useState<string>("");
-  const [selectedDepartment, setSelectedDepartment] = useState<string>("");
+  const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
+  const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
+
+  // Replace the two Select components with DropdownMenu components
+  const formatSelectedItems = (items: string[]) => {
+    if (items.length === 0) return "";
+    return items.join(", ");
+  };
 
   return (
     <div className="flex flex-col gap-4 p-8">
@@ -158,33 +127,88 @@ export default function DashboardPage() {
               <SelectItem value="30d">Last 30 days</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={selectedCountry} onValueChange={setSelectedCountry}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select country" />
-            </SelectTrigger>
-            <SelectContent>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="inline-flex items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background w-[180px]">
+              <span className="truncate">
+                {selectedCountries.length > 0
+                  ? formatSelectedItems(selectedCountries)
+                  : "Filter by Country"}
+              </span>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-[180px]">
+              <div className="flex justify-between px-2 py-1.5 text-sm border-b">
+                <button
+                  onClick={() =>
+                    setSelectedCountries(countries.map((c) => c.value))
+                  }
+                  className="text-blue-600 hover:underline"
+                >
+                  Select All
+                </button>
+                <button
+                  onClick={() => setSelectedCountries([])}
+                  className="text-red-600 hover:underline"
+                >
+                  Reset
+                </button>
+              </div>
               {countries.map((country) => (
-                <SelectItem key={country.value} value={country.value}>
+                <DropdownMenuCheckboxItem
+                  key={country.value}
+                  checked={selectedCountries.includes(country.value)}
+                  onCheckedChange={() => {
+                    const updated = selectedCountries.includes(country.value)
+                      ? selectedCountries.filter((c) => c !== country.value)
+                      : [...selectedCountries, country.value];
+                    setSelectedCountries(updated);
+                  }}
+                >
                   {country.label}
-                </SelectItem>
+                </DropdownMenuCheckboxItem>
               ))}
-            </SelectContent>
-          </Select>
-          <Select
-            value={selectedDepartment}
-            onValueChange={setSelectedDepartment}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select department" />
-            </SelectTrigger>
-            <SelectContent>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="inline-flex items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background w-[180px]">
+              <span className="truncate">
+                {selectedDepartments.length > 0
+                  ? formatSelectedItems(selectedDepartments)
+                  : "Filter by Department"}
+              </span>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-[180px]">
+              <div className="flex justify-between px-2 py-1.5 text-sm border-b">
+                <button
+                  onClick={() =>
+                    setSelectedDepartments(departments.map((d) => d.value))
+                  }
+                  className="text-blue-600 hover:underline"
+                >
+                  Select All
+                </button>
+                <button
+                  onClick={() => setSelectedDepartments([])}
+                  className="text-red-600 hover:underline"
+                >
+                  Reset
+                </button>
+              </div>
               {departments.map((dept) => (
-                <SelectItem key={dept.value} value={dept.value}>
+                <DropdownMenuCheckboxItem
+                  key={dept.value}
+                  checked={selectedDepartments.includes(dept.value)}
+                  onCheckedChange={() => {
+                    const updated = selectedDepartments.includes(dept.value)
+                      ? selectedDepartments.filter((d) => d !== dept.value)
+                      : [...selectedDepartments, dept.value];
+                    setSelectedDepartments(updated);
+                  }}
+                >
                   {dept.label}
-                </SelectItem>
+                </DropdownMenuCheckboxItem>
               ))}
-            </SelectContent>
-          </Select>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
