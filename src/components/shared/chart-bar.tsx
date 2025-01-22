@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { TrendingUp } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, ReferenceLine } from "recharts";
 
 import {
   Card,
@@ -20,45 +19,48 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Button } from "@/components/ui/button";
 import {
   SegmentedControl,
   SegmentedControlItem,
 } from "@/components/ui/segmented-control";
 
 const dailyData = [
-  { date: "2024-06-01", desktop: 186, mobile: 80 },
-  { date: "2024-06-02", desktop: 305, mobile: 200 },
-  { date: "2024-06-03", desktop: 237, mobile: 120 },
-  { date: "2024-06-04", desktop: 173, mobile: 190 },
-  { date: "2024-06-05", desktop: 209, mobile: 130 },
-  { date: "2024-06-06", desktop: 214, mobile: 140 },
-  { date: "2024-06-07", desktop: 225, mobile: 150 },
+  { date: "2024-06-01", accuracy: 85, completeness: 82, hallucination: 8 },
+  { date: "2024-06-02", accuracy: 88, completeness: 85, hallucination: 7 },
+  { date: "2024-06-03", accuracy: 82, completeness: 78, hallucination: 12 },
+  { date: "2024-06-04", accuracy: 86, completeness: 80, hallucination: 9 },
+  { date: "2024-06-05", accuracy: 84, completeness: 83, hallucination: 8 },
+  { date: "2024-06-06", accuracy: 87, completeness: 84, hallucination: 6 },
+  { date: "2024-06-07", accuracy: 89, completeness: 86, hallucination: 7 },
 ];
 
 const monthlyData = [
-  { date: "2024-01-01", desktop: 5860, mobile: 2500 },
-  { date: "2024-02-01", desktop: 6305, mobile: 2800 },
-  { date: "2024-03-01", desktop: 6237, mobile: 3120 },
-  { date: "2024-04-01", desktop: 5973, mobile: 2990 },
-  { date: "2024-05-01", desktop: 6209, mobile: 3130 },
-  { date: "2024-06-01", desktop: 6214, mobile: 3140 },
+  { date: "2024-01-01", accuracy: 83, completeness: 80, hallucination: 9 },
+  { date: "2024-02-01", accuracy: 85, completeness: 82, hallucination: 8 },
+  { date: "2024-03-01", accuracy: 86, completeness: 83, hallucination: 7 },
+  { date: "2024-04-01", accuracy: 84, completeness: 81, hallucination: 8 },
+  { date: "2024-05-01", accuracy: 87, completeness: 84, hallucination: 6 },
+  { date: "2024-06-01", accuracy: 88, completeness: 85, hallucination: 7 },
 ];
 
 const yearlyData = [
-  { date: "2023-01-01", desktop: 72000, mobile: 30000 },
-  { date: "2024-01-01", desktop: 78000, mobile: 34000 },
-  { date: "2025-01-01", desktop: 82000, mobile: 38000 },
+  { date: "2022-01-01", accuracy: 80, completeness: 77, hallucination: 10 },
+  { date: "2023-01-01", accuracy: 84, completeness: 81, hallucination: 8 },
+  { date: "2024-01-01", accuracy: 88, completeness: 85, hallucination: 6 },
 ];
 
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "hsl(var(--chart-1))",
+  accuracy: {
+    label: "Accuracy",
+    color: "hsl(240, 60%, 70%)", // #8884d8 equivalent
   },
-  mobile: {
-    label: "Mobile",
-    color: "hsl(var(--chart-2))",
+  completeness: {
+    label: "Completeness",
+    color: "hsl(145, 45%, 65%)", // #82ca9d equivalent
+  },
+  hallucination: {
+    label: "Hallucination",
+    color: "hsl(45, 100%, 67%)", // #ffc658 equivalent
   },
 } satisfies ChartConfig;
 
@@ -88,16 +90,13 @@ export function ChartBar() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>
-          Bar Chart - {timeFrame.charAt(0).toUpperCase() + timeFrame.slice(1)}{" "}
-          Visitors
-        </CardTitle>
+        <CardTitle>Model Evaluation Metrics</CardTitle>
         <CardDescription>
           {timeFrame === "daily"
             ? "June 1 - June 7, 2024"
             : timeFrame === "monthly"
             ? "January - June 2024"
-            : "2020 - 2024"}
+            : "2022 - 2024"}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -123,35 +122,59 @@ export function ChartBar() {
             />
             <ChartTooltip content={<ChartTooltipContent hideLabel />} />
             <ChartLegend content={<ChartLegendContent />} />
-            <Bar
-              dataKey="desktop"
-              stackId="a"
-              fill="var(--color-desktop)"
-              radius={[0, 0, 4, 4]}
+            <ReferenceLine
+              y={70}
+              stroke={chartConfig.accuracy.color}
+              strokeWidth={2}
+              strokeDasharray="5 5"
+              label={{
+                value: "Accuracy Threshold (70%)",
+                fill: chartConfig.accuracy.color,
+                position: "right",
+                dy: -10,
+              }}
+            />
+            <ReferenceLine
+              y={70}
+              stroke={chartConfig.completeness.color}
+              strokeWidth={2}
+              strokeDasharray="5 5"
+              label={{
+                value: "Completeness Threshold (70%)",
+                fill: chartConfig.completeness.color,
+                position: "right",
+                dy: 10,
+              }}
+            />
+            <ReferenceLine
+              y={10}
+              stroke={chartConfig.hallucination.color}
+              strokeWidth={2}
+              strokeDasharray="5 5"
+              label={{
+                value: "Hallucination Threshold (10%)",
+                fill: chartConfig.hallucination.color,
+                position: "right",
+              }}
             />
             <Bar
-              dataKey="mobile"
-              stackId="a"
-              fill="var(--color-mobile)"
+              dataKey="accuracy"
+              fill={chartConfig.accuracy.color}
+              radius={[4, 4, 0, 0]}
+            />
+            <Bar
+              dataKey="completeness"
+              fill={chartConfig.completeness.color}
+              radius={[4, 4, 0, 0]}
+            />
+            <Bar
+              dataKey="hallucination"
+              fill={chartConfig.hallucination.color}
               radius={[4, 4, 0, 0]}
             />
           </BarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
-          Trending up by 5.2% this{" "}
-          {timeFrame === "daily"
-            ? "week"
-            : timeFrame === "monthly"
-            ? "month"
-            : "year"}{" "}
-          <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="leading-none text-muted-foreground">
-          Showing {timeFrame} visitors
-        </div>
-      </CardFooter>
     </Card>
   );
 }

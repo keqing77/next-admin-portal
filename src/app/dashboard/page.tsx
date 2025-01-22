@@ -114,11 +114,30 @@ const requestData = [
   // ... more data
 ];
 
+// Add these constants near the top of the file, after other constants
+const countries = [
+  { value: "HK", label: "Hong Kong" },
+  { value: "UK", label: "United Kingdom" },
+  { value: "SG", label: "Singapore" },
+  { value: "ARG", label: "Argentina" },
+];
+
+const departments = [
+  { value: "ASP", label: "ASP" },
+  { value: "CIO", label: "CIO" },
+  { value: "CTO", label: "CTO" },
+  { value: "FBI", label: "FBI" },
+];
+
 export default function DashboardPage() {
   const [date, setDate] = useState({
     from: new Date(),
     to: addDays(new Date(), 7),
   });
+
+  // Add these state variables after the date state
+  const [selectedCountry, setSelectedCountry] = useState<string>("");
+  const [selectedDepartment, setSelectedDepartment] = useState<string>("");
 
   return (
     <div className="flex flex-col gap-4 p-8">
@@ -137,6 +156,33 @@ export default function DashboardPage() {
               <SelectItem value="24h">Last 24 hours</SelectItem>
               <SelectItem value="7d">Last 7 days</SelectItem>
               <SelectItem value="30d">Last 30 days</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select country" />
+            </SelectTrigger>
+            <SelectContent>
+              {countries.map((country) => (
+                <SelectItem key={country.value} value={country.value}>
+                  {country.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={selectedDepartment}
+            onValueChange={setSelectedDepartment}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select department" />
+            </SelectTrigger>
+            <SelectContent>
+              {departments.map((dept) => (
+                <SelectItem key={dept.value} value={dept.value}>
+                  {dept.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -159,144 +205,10 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <Card className="overflow-hidden">
-          <CardHeader>
-            <CardTitle>Model Evaluation</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0 sm:p-6">
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={modelEvaluationData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <ReferenceLine
-                  y={70}
-                  stroke="#8884d8"
-                  strokeWidth={2}
-                  strokeDasharray="5 5"
-                  label={{
-                    value: "Accuracy Threshold (70%)",
-                    fill: "#8884d8",
-                    position: "right",
-                    dy: -10, // 向上偏移
-                  }}
-                />
-                <ReferenceLine
-                  y={70}
-                  stroke="#82ca9d"
-                  strokeWidth={2}
-                  strokeDasharray="5 5"
-                  label={{
-                    value: "Completeness Threshold (70%)",
-                    fill: "#82ca9d",
-                    position: "right",
-                    dy: 10, // 向下偏移
-                  }}
-                />
-                <ReferenceLine
-                  y={10}
-                  stroke="#ffc658"
-                  strokeWidth={2}
-                  strokeDasharray="5 5"
-                  label={{
-                    value: "Hallucination Threshold (10%)",
-                    fill: "#ffc658",
-                    position: "right",
-                  }}
-                />
-                <Bar dataKey="accuracy" fill="#8884d8" name="Accuracy" />
-                <Bar
-                  dataKey="completeness"
-                  fill="#82ca9d"
-                  name="Completeness"
-                />
-                <Bar
-                  dataKey="hallucination"
-                  fill="#ffc658"
-                  name="Hallucination"
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card className="overflow-hidden">
-          <CardHeader>
-            <CardTitle>Response Time by Date</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0 sm:p-6">
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={responseTimeData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="time"
-                  stroke="#8884d8"
-                  name="Response Time (ms)"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card className="overflow-hidden">
-          <CardHeader>
-            <CardTitle>Total Costs</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0 sm:p-6">
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={costData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="cost"
-                  stroke="#82ca9d"
-                  name="Cost ($)"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card className="overflow-hidden">
-          <CardHeader>
-            <CardTitle>Number of Requests</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0 sm:p-6">
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={requestData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="requests"
-                  stroke="#ffc658"
-                  name="Number of Requests"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-4xl">
-          <ChartLine />
-          <ChartBar />
-          <ChartArea />
-          <ChartPie />
-        </div>
+        <ChartBar />
+        <ChartLine />
+        <ChartArea />
+        <ChartPie />
       </div>
     </div>
   );
