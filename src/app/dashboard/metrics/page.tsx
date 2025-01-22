@@ -272,7 +272,7 @@ export default function MetricsPage() {
           </TableHeader>
           <TableBody>
             {filteredData.map((row) => (
-              <TableRow key={row.requestId}>
+              <TableRow key={`${row.requestId}-${row.metricName}`}>
                 <TableCell>
                   <Link
                     href={`/dashboard/metrics/${row.requestId}`}
