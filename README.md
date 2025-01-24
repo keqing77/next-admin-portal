@@ -28,7 +28,10 @@ pnpm run dev
 
 ## Using Docker
 
-```
-docker pull
-docker run
+```sh
+# build docker image
+docker build -t admin-platform-ui .
+
+# run docker image
+docker run -p 3000:3000 admin-platform-ui
 ```
