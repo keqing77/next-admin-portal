@@ -101,27 +101,32 @@ const data = {
       icon: Bot,
     },
     {
-      title: "Users",
-      url: "/dashboard/users",
-      icon: Users,
+      title: "User Activity",
+      url: "/dashboard/activity",
+      icon: Bot,
     },
-    {
-      title: "Prompts",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "Prompts management",
-          url: "/dashboard/prompts",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "/dashboard/settings",
-      icon: Settings2,
-    },
+    // {
+    //   title: "Users",
+    //   url: "/dashboard/users",
+    //   icon: Users,
+    // },
+    // {
+    //   title: "Prompts",
+    //   url: "#",
+    //   icon: SquareTerminal,
+    //   isActive: true,
+    //   items: [
+    //     {
+    //       title: "Prompts management",
+    //       url: "/dashboard/prompts",
+    //     },
+    //   ],
+    // },
+    // {
+    //   title: "Settings",
+    //   url: "/dashboard/settings",
+    //   icon: Settings2,
+    // },
   ],
   navWithoutItems: [
     {
