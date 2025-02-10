@@ -15,8 +15,7 @@ RUN pnpm install --frozen-lockfile
 # Copy the rest of the application code
 COPY . .
 
-# Build application with ESLint checks disabled
-ENV DISABLE_ESLINT_PLUGIN=true
+# Build application
 RUN pnpm run build
 
 # Stage 2: Run the application

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, ArrowUpDown } from "lucide-react";
+import { AlertCircle, ArrowUpDown, CheckCircle2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -94,7 +94,7 @@ export default function MetricsPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Metrics Dashboard</h1>
+      {/* <h1 className="text-2xl font-bold mb-6">Metrics Dashboard</h1> */}
 
       {/* Filters */}
       <div className="flex gap-4 mb-6">
@@ -260,38 +260,61 @@ export default function MetricsPage() {
               <TableHead className="cursor-pointer">
                 Username <ArrowUpDown className="ml-2 h-4 w-4 inline" />
               </TableHead>
-              <TableHead>Metric Name</TableHead>
-              <TableHead>Evaluation Method</TableHead>
               <TableHead className="cursor-pointer">
-                Timestamp <ArrowUpDown className="ml-2 h-4 w-4 inline" />
+                Create Time <ArrowUpDown className="ml-2 h-4 w-4 inline" />
               </TableHead>
-              <TableHead>Metric Value</TableHead>
-              <TableHead>Threshold</TableHead>
-              <TableHead>Actionable Insights</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Accuracy (%)</TableHead>
+              <TableHead>Completeness (%)</TableHead>
+              <TableHead>Hallucination (%)</TableHead>
+              <TableHead>Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredData.map((row) => (
-              <TableRow key={`${row.requestId}-${row.metricName}`}>
-                <TableCell>
-                  <Link
-                    href={`/dashboard/metrics/${row.requestId}`}
-                    className="text-blue-600 hover:underline"
-                  >
-                    {row.requestId}
-                  </Link>
-                </TableCell>
-                <TableCell>{row.username}</TableCell>
-                <TableCell>{row.metricName}</TableCell>
-                <TableCell>{row.evaluationMethod}</TableCell>
-                <TableCell>
-                  {new Date(row.timestamp).toLocaleString()}
-                </TableCell>
-                <TableCell>{row.metricValue}</TableCell>
-                <TableCell>{row.threshold}</TableCell>
-                <TableCell>{row.actionableInsights}</TableCell>
-              </TableRow>
-            ))}
+            {filteredData.map((row) => {
+              const isSuccess =
+                row.accuracy > 70 &&
+                row.completeness > 70 &&
+                row.hallucination < 10;
+
+              return (
+                <TableRow key={row.requestId}>
+                  <TableCell>
+                    <Link
+                      href={`/dashboard/metrics/${row.requestId}`}
+                      className="text-blue-600 hover:underline"
+                    >
+                      {row.requestId}
+                    </Link>
+                  </TableCell>
+                  <TableCell>{row.username}</TableCell>
+                  <TableCell>{row.createTime}</TableCell>
+                  <TableCell>
+                    {isSuccess ? (
+                      <CheckCircle2 className="h-5 w-5 text-green-500" />
+                    ) : (
+                      <AlertCircle className="h-5 w-5 text-red-500" />
+                    )}
+                  </TableCell>
+                  <TableCell>{row.accuracy}</TableCell>
+                  <TableCell>{row.completeness}</TableCell>
+                  <TableCell>{row.hallucination}</TableCell>
+                  <TableCell>
+                    {!isSuccess ? (
+                      <a
+                        href={`/api/reports/${row.requestId}`}
+                        download
+                        className="text-blue-600 hover:underline"
+                      >
+                        Download Report
+                      </a>
+                    ) : (
+                      row.actionableInsights
+                    )}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>

@@ -1,207 +1,78 @@
 import { DateRange } from "react-day-picker";
+import { format } from "date-fns";
 
 export type BusinessUnit = 'ASP' | 'CIO' | 'CTO' | 'FBI';
 
 export interface MetricData {
   requestId: string;
-  metricName: string;
-  evaluationMethod: string;
-  timestamp: string;
-  metricValue: number;
-  threshold: number;
-  actionableInsights: string;
+  username: string;
+  createTime: string;
   country: string;
   businessUnit: BusinessUnit;
+  accuracy: number;
+  completeness: number;
+  hallucination: number;
+  actionableInsights: string;
   input?: string;
   output?: string;
   responseTime?: number;
   model?: string;
-  username: string;
 }
 
 export const mockData: MetricData[] = [
-  // REQ001 - john.smith
   {
     requestId: "REQ001",
-    metricName: "Accuracy",
-    evaluationMethod: "Manual",
-    timestamp: "2024-03-15T10:00:00",
-    metricValue: 85,
-    threshold: 70,
-    actionableInsights: "NA",
     username: "john.smith",
+    createTime: "2024-03-15 10:00:00",
     country: "HK",
-    businessUnit: "ASP"
-  },
-  {
-    requestId: "REQ001",
-    metricName: "Completeness",
-    evaluationMethod: "Manual",
-    timestamp: "2024-03-15T10:00:00",
-    metricValue: 92,
-    threshold: 70,
-    actionableInsights: "NA",
-    username: "john.smith",
-    country: "HK",
-    businessUnit: "ASP"
-  },
-  {
-    requestId: "REQ001",
-    metricName: "Hallucination",
-    evaluationMethod: "Manual",
-    timestamp: "2024-03-15T10:00:00",
-    metricValue: 5,
-    threshold: 10,
-    actionableInsights: "NA",
-    username: "john.smith",
-    country: "HK",
-    businessUnit: "ASP"
-  },
-  // REQ002 - sarah.chen
-  {
-    requestId: "REQ002",
-    metricName: "Accuracy",
-    evaluationMethod: "Auto",
-    timestamp: "2024-03-15T11:30:00",
-    metricValue: 78,
-    threshold: 70,
-    actionableInsights: "NA",
-    username: "sarah.chen",
-    country: "SG",
-    businessUnit: "CIO"
+    businessUnit: "ASP",
+    accuracy: 85,
+    completeness: 92,
+    hallucination: 5,
+    actionableInsights: "All metrics within acceptable range"
   },
   {
     requestId: "REQ002",
-    metricName: "Completeness",
-    evaluationMethod: "Auto",
-    timestamp: "2024-03-15T11:30:00",
-    metricValue: 88,
-    threshold: 70,
-    actionableInsights: "NA",
     username: "sarah.chen",
+    createTime: "2024-03-15 11:30:00",
     country: "SG",
-    businessUnit: "CIO"
-  },
-  {
-    requestId: "REQ002",
-    metricName: "Hallucination",
-    evaluationMethod: "Auto",
-    timestamp: "2024-03-15T11:30:00",
-    metricValue: 8,
-    threshold: 10,
-    actionableInsights: "NA",
-    username: "sarah.chen",
-    country: "SG",
-    businessUnit: "CIO"
-  },
-  // REQ003 - mike.johnson
-  {
-    requestId: "REQ003",
-    metricName: "Accuracy",
-    evaluationMethod: "Manual",
-    timestamp: "2024-03-15T09:15:00",
-    metricValue: 95,
-    threshold: 70,
-    actionableInsights: "NA",
-    username: "mike.johnson",
-    country: "UK",
-    businessUnit: "FBI"
+    businessUnit: "CIO",
+    accuracy: 78,
+    completeness: 88,
+    hallucination: 8,
+    actionableInsights: "All metrics within acceptable range"
   },
   {
     requestId: "REQ003",
-    metricName: "Completeness",
-    evaluationMethod: "Manual",
-    timestamp: "2024-03-15T09:15:00",
-    metricValue: 90,
-    threshold: 70,
-    actionableInsights: "NA",
     username: "mike.johnson",
+    createTime: "2024-03-15 09:15:00",
     country: "UK",
-    businessUnit: "FBI"
-  },
-  {
-    requestId: "REQ003",
-    metricName: "Hallucination",
-    evaluationMethod: "Manual",
-    timestamp: "2024-03-15T09:15:00",
-    metricValue: 2,
-    threshold: 10,
-    actionableInsights: "NA",
-    username: "mike.johnson",
-    country: "UK",
-    businessUnit: "FBI"
+    businessUnit: "FBI",
+    accuracy: 65,
+    completeness: 60,
+    hallucination: 2,
+    actionableInsights: "All metrics within acceptable range"
   },
   {
     requestId: "REQ004",
-    metricName: "Accuracy",
-    evaluationMethod: "Auto",
-    timestamp: "2024-03-15T13:45:00",
-    metricValue: 82,
-    threshold: 70,
-    actionableInsights: "NA",
     username: "alex.wong",
+    createTime: "2024-03-15 13:45:00",
     country: "HK",
-    businessUnit: "CTO"
-  },
-  {
-    requestId: "REQ004",
-    metricName: "Completeness",
-    evaluationMethod: "Auto",
-    timestamp: "2024-03-15T13:45:00",
-    metricValue: 89,
-    threshold: 70,
-    actionableInsights: "NA",
-    username: "alex.wong",
-    country: "HK",
-    businessUnit: "CTO"
-  },
-  {
-    requestId: "REQ004",
-    metricName: "Hallucination",
-    evaluationMethod: "Auto",
-    timestamp: "2024-03-15T13:45:00",
-    metricValue: 6,
-    threshold: 10,
-    actionableInsights: "NA",
-    username: "alex.wong",
-    country: "HK",
-    businessUnit: "CTO"
-  },
-  // REQ005 - emma.liu
-  {
-    requestId: "REQ005",
-    metricName: "Accuracy",
-    evaluationMethod: "Manual",
-    timestamp: "2024-03-15T14:20:00",
-    metricValue: 87,
-    threshold: 70,
-    actionableInsights: "NA",
-    username: "emma.liu",
-    country: "SG",
-    businessUnit: "ASP"
+    businessUnit: "CTO",
+    accuracy: 82,
+    completeness: 89,
+    hallucination: 6,
+    actionableInsights: "All metrics within acceptable range"
   },
   {
     requestId: "REQ005",
-    metricName: "Completeness",
-    evaluationMethod: "Manual",
-    timestamp: "2024-03-15T14:20:00",
-    metricValue: 91,
-    threshold: 70,
-    actionableInsights: "NA",
     username: "emma.liu",
+    createTime: "2024-03-15 14:20:00",
     country: "SG",
-    businessUnit: "ASP"
-  },
-  {
-    requestId: "REQ005",
-    metricName: "Hallucination",
-    evaluationMethod: "Manual",
-    timestamp: "2024-03-15T14:20:00",
-    metricValue: 4,
-    threshold: 10,
-    actionableInsights: "NA",
-    username: "emma.liu",
-    country: "SG",
-    businessUnit: "ASP"
-  },
+    businessUnit: "ASP",
+    accuracy: 87,
+    completeness: 91,
+    hallucination: 4,
+    actionableInsights: "All metrics within acceptable range"
+  }
 ];

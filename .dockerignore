@@ -1,9 +1,11 @@
 .git
-node_modules
-.next
+.idea
+.vscode
 .env*
-npm-debug.log*
+node_modules
+test
 README.md
+npm-debug.log*
 .dockerignore
 Dockerfile
 docker-compose*
