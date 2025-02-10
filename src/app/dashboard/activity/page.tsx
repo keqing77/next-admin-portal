@@ -2,13 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  ArrowUpDown,
-  ChevronDown,
-  ChevronUp,
-  PlusCircle,
-  MinusCircle,
-} from "lucide-react";
+import { ArrowUpDown, PlusCircle, MinusCircle } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -18,15 +12,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { DateRange } from "react-day-picker";
 import { subDays } from "date-fns";
 import { mockData } from "./mockData";
+import { Highlight, themes } from "prism-react-renderer";
 
 interface ExpandableJsonProps {
   content: Record<string, any> | string;
@@ -45,19 +34,30 @@ const ExpandableJson: React.FC<ExpandableJsonProps> = ({ content }) => {
     return str.length > 30 ? str.substring(0, 30) + "..." : str;
   };
 
-  // If content is just a string (like "-"), render it directly
   if (typeof content === "string") {
     return <div className="text-sm">{content}</div>;
   }
+
+  const jsonString = JSON.stringify(content, null, 2);
 
   return (
     <div className="relative">
       <div className="flex items-center gap-2">
         {isExpanded ? (
           <div className="w-full">
-            <pre className="bg-slate-50 p-3 rounded-md overflow-auto max-h-[300px] text-sm font-mono border">
-              {JSON.stringify(content, null, 2)}
-            </pre>
+            <Highlight theme={themes.vsLight} code={jsonString} language="json">
+              {({ className, style, tokens, getLineProps, getTokenProps }) => (
+                <pre className="bg-slate-50 p-3 rounded-md overflow-auto max-h-[300px] text-sm font-mono border">
+                  {tokens.map((line, i) => (
+                    <div key={i} {...getLineProps({ line })}>
+                      {line.map((token, key) => (
+                        <span key={key} {...getTokenProps({ token })} />
+                      ))}
+                    </div>
+                  ))}
+                </pre>
+              )}
+            </Highlight>
           </div>
         ) : (
           <div className="text-sm truncate max-w-[200px] font-mono">

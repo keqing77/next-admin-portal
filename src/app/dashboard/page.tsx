@@ -9,13 +9,7 @@ import {
   Star,
 } from "lucide-react";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import {
   Select,
@@ -111,7 +105,7 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-4 p-8">
       <div className="flex items-center justify-between flex-wrap gap-4">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
+        {/* <h1 className="text-3xl font-bold">Dashboard</h1> */}
         <div className="flex gap-4">
           <DatePickerWithRange date={date} setDate={setDate} />
           <Select defaultValue="24h">
