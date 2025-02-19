@@ -18,7 +18,7 @@ export function Header() {
         scroll ? (scrolled ? "border-b" : "bg-transparent") : "border-b"
       )}
     >
-      <div className="mx-auto container flex h-14 items-center">
+      <div className="container flex h-14 items-center px-4 sm:px-8 lg:px-12">
         <div className="mr-4 flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <span className="font-bold">LOGO</span>

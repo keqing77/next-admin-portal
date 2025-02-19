@@ -1,33 +1,50 @@
+"use client";
+
 import { siteConfig } from "@/config/site";
 import { cn, nFormatter } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import Link from "@/components/link/link";
 import { Icons } from "@/components/shared/icons";
+import { motion } from "motion/react";
 
-export default async function HeroLanding() {
+export default function HeroLanding() {
   return (
-    <section className="space-y-6 py-12 sm:py-20 lg:py-24 mx-auto">
+    <motion.section
+      className="space-y-6 py-12 sm:py-20 lg:py-24 mx-auto"
+      initial={{ opacity: 0, y: 100 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+    >
       <div className="container flex max-w-5xl flex-col items-center gap-5 text-center">
-        <h1 className="text-balance font-urban text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-[66px]">
+        <motion.h1
+          className="text-balance font-urban text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-[66px]"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
           <span className=" font-extrabold">
             A powerful portal for GenAI platform :{/* <span> */}
             <span className="bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 bg-clip-text text-transparent">
               {" Admin Portal"}
             </span>
           </span>
-        </h1>
+        </motion.h1>
 
-        <p
+        <motion.p
           className="max-w-2xl text-balance leading-normal text-muted-foreground sm:text-xl sm:leading-8"
-          style={{ animationDelay: "0.35s", animationFillMode: "forwards" }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
         >
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Sint repellat
           earum similique perferendis adipisci modi.
-        </p>
+        </motion.p>
 
-        <div
+        <motion.div
           className="flex justify-center space-x-2 md:space-x-4"
-          style={{ animationDelay: "0.4s", animationFillMode: "forwards" }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
         >
           <Link
             href={`/dashboard`}
@@ -58,8 +75,8 @@ export default async function HeroLanding() {
               <span className="hidden sm:inline-block"></span> GitHub
             </p>
           </Link>
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 }

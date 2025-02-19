@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "@/components/link/link";
 import MaxWidthWrapper from "@/components/shared/max-width-wrapper";
+import { motion } from "motion/react";
 
 const logos = [
   {
@@ -227,37 +230,57 @@ const logos = [
 
 export default function Powered() {
   return (
-    <section className=" mx-auto py-14 text-muted-foreground ">
+    <section className="mx-auto py-14 text-muted-foreground">
       <MaxWidthWrapper>
-        <h2 className="text-center text-sm font-semibold uppercase">
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="text-center text-sm font-semibold uppercase"
+        >
           powered by
-        </h2>
+        </motion.h2>
 
         <div className="mt-10 grid grid-cols-2 place-items-center gap-8 xl:gap-36 md:grid-cols-4">
-          {logos.slice(0, 4).map((logo) => (
-            <Link
-              target="_blank"
+          {logos.slice(0, 4).map((logo, index) => (
+            <motion.div
               key={logo.title}
-              href={logo.href}
-              aria-label={logo.title}
-              className="duration-250 grayscale transition hover:text-foreground hover:grayscale-0"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              {logo.icon}
-            </Link>
+              <Link
+                target="_blank"
+                href={logo.href}
+                aria-label={logo.title}
+                className="duration-250 grayscale transition hover:text-foreground hover:grayscale-0"
+              >
+                {logo.icon}
+              </Link>
+            </motion.div>
           ))}
         </div>
 
         <div className="mt-8 grid grid-cols-2 place-items-center gap-8 xl:gap-36 md:mt-10 md:grid-cols-4">
-          {logos.slice(4, 8).map((logo) => (
-            <Link
-              target="_blank"
+          {logos.slice(4, 8).map((logo, index) => (
+            <motion.div
               key={logo.title}
-              href={logo.href}
-              aria-label={logo.title}
-              className="duration-250 grayscale transition hover:text-foreground hover:grayscale-0"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              {logo.icon}
-            </Link>
+              <Link
+                target="_blank"
+                href={logo.href}
+                aria-label={logo.title}
+                className="duration-250 grayscale transition hover:text-foreground hover:grayscale-0"
+              >
+                {logo.icon}
+              </Link>
+            </motion.div>
           ))}
         </div>
       </MaxWidthWrapper>

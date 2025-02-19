@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "@/components/link/link";
+import { motion } from "motion/react";
 
 import { features } from "@/config/landing";
 import { Button } from "@/components/ui/button";
@@ -6,26 +9,46 @@ import { HeaderSection } from "@/components/shared/header-section";
 import { Icons } from "@/components/shared/icons";
 import MaxWidthWrapper from "@/components/shared/max-width-wrapper";
 
+// Add this type at the top of the file, after imports
+type IconKeys = keyof typeof Icons;
+
 export default function Features() {
   return (
-    <section>
+    <motion.section
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8 }}
+    >
       <div className="pb-6 pt-20">
         <MaxWidthWrapper className="mx-auto">
-          <HeaderSection
-            label={"Features"}
-            title={"Discover all features."}
-            subtitle={
-              "These features are designed to enhance your productivity and user experience."
-            }
-          />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            <HeaderSection
+              label={"Features"}
+              title={"Discover all features."}
+              subtitle={
+                "These features are designed to enhance your productivity and user experience."
+              }
+            />
+          </motion.div>
+
           <div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature) => {
-              const Icon = Icons[`${feature.icon}`] || Icons["nextjs"];
+            {features.map((feature, index) => {
+              const Icon = Icons[feature.icon as IconKeys] || Icons["nextjs"];
 
               return (
-                <div
-                  className="group relative overflow-hidden rounded-2xl border bg-background p-5 md:p-8"
+                <motion.div
                   key={feature.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="group relative overflow-hidden rounded-2xl border bg-background p-5 md:p-8"
                 >
                   <div
                     aria-hidden="true"
@@ -55,12 +78,12 @@ export default function Features() {
                       </Button>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
         </MaxWidthWrapper>
       </div>
-    </section>
+    </motion.section>
   );
 }
