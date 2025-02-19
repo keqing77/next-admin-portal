@@ -79,12 +79,12 @@ const data = {
       plan: "Platform",
     },
     {
-      name: "Acme Corp.",
+      name: "Application B",
       logo: AudioWaveform,
       plan: "Startup",
     },
     {
-      name: "Evil Corp.",
+      name: "Application C",
       logo: Command,
       plan: "Free",
     },
@@ -206,7 +206,7 @@ export default function AppSidebar() {
                     <Plus className="size-4" />
                   </div>
                   <div className="font-medium text-muted-foreground">
-                    Add team
+                    Add Application
                   </div>
                 </DropdownMenuItem>
               </DropdownMenuContent>
