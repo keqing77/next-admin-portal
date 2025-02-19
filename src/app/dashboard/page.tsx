@@ -32,6 +32,11 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Filter } from "lucide-react";
+import { DataTable } from "@/components/shared/data-table";
+import { Input } from "@/components/ui/input";
 
 const statsCards = [
   {
@@ -92,141 +97,178 @@ export default function DashboardPage() {
     to: addDays(new Date(), 7),
   });
 
-  // Add these state variables after the date state
-  const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
-  const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
-
-  // Replace the two Select components with DropdownMenu components
-  const formatSelectedItems = (items: string[]) => {
-    if (items.length === 0) return "";
-    return items.join(", ");
-  };
+  const [filters, setFilters] = useState({
+    timeRange: "24h",
+    countries: [] as string[],
+    departments: [] as string[],
+    searchQuery: "",
+  });
 
   return (
-    <div className="flex flex-col gap-4 p-8">
-      <div className="flex items-center justify-between flex-wrap gap-4">
-        {/* <h1 className="text-3xl font-bold">Dashboard</h1> */}
-        <div className="flex gap-4">
-          <DatePickerWithRange date={date} setDate={setDate} />
-          <Select defaultValue="24h">
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select time range" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="30m">Last 30 minutes</SelectItem>
-              <SelectItem value="1h">Last 1 hour</SelectItem>
-              <SelectItem value="3h">Last 3 hours</SelectItem>
-              <SelectItem value="24h">Last 24 hours</SelectItem>
-              <SelectItem value="7d">Last 7 days</SelectItem>
-              <SelectItem value="30d">Last 30 days</SelectItem>
-            </SelectContent>
-          </Select>
-          <DropdownMenu>
-            <DropdownMenuTrigger className="inline-flex items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background w-[180px]">
-              <span className="truncate">
-                {selectedCountries.length > 0
-                  ? formatSelectedItems(selectedCountries)
-                  : "Filter by Country"}
-              </span>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-[180px]">
-              <div className="flex justify-between px-2 py-1.5 text-sm border-b">
-                <button
-                  onClick={() =>
-                    setSelectedCountries(countries.map((c) => c.value))
-                  }
-                  className="text-blue-600 hover:underline"
-                >
-                  Select All
-                </button>
-                <button
-                  onClick={() => setSelectedCountries([])}
-                  className="text-red-600 hover:underline"
-                >
-                  Reset
-                </button>
-              </div>
-              {countries.map((country) => (
-                <DropdownMenuCheckboxItem
-                  key={country.value}
-                  checked={selectedCountries.includes(country.value)}
-                  onCheckedChange={() => {
-                    const updated = selectedCountries.includes(country.value)
-                      ? selectedCountries.filter((c) => c !== country.value)
-                      : [...selectedCountries, country.value];
-                    setSelectedCountries(updated);
-                  }}
-                >
-                  {country.label}
-                </DropdownMenuCheckboxItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DropdownMenu>
-            <DropdownMenuTrigger className="inline-flex items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background w-[180px]">
-              <span className="truncate">
-                {selectedDepartments.length > 0
-                  ? formatSelectedItems(selectedDepartments)
-                  : "Filter by Department"}
-              </span>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-[180px]">
-              <div className="flex justify-between px-2 py-1.5 text-sm border-b">
-                <button
-                  onClick={() =>
-                    setSelectedDepartments(departments.map((d) => d.value))
-                  }
-                  className="text-blue-600 hover:underline"
-                >
-                  Select All
-                </button>
-                <button
-                  onClick={() => setSelectedDepartments([])}
-                  className="text-red-600 hover:underline"
-                >
-                  Reset
-                </button>
-              </div>
-              {departments.map((dept) => (
-                <DropdownMenuCheckboxItem
-                  key={dept.value}
-                  checked={selectedDepartments.includes(dept.value)}
-                  onCheckedChange={() => {
-                    const updated = selectedDepartments.includes(dept.value)
-                      ? selectedDepartments.filter((d) => d !== dept.value)
-                      : [...selectedDepartments, dept.value];
-                    setSelectedDepartments(updated);
-                  }}
-                >
-                  {dept.label}
-                </DropdownMenuCheckboxItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+    <div className="flex flex-col gap-4">
+      {/* Navigation Tabs */}
+      <div className="border-b">
+        <div className="flex h-16 items-center px-4">
+          <div className="flex space-x-4">
+            <h1 className="text-2xl font-bold">Analytics</h1>
+          </div>
+          <div className="ml-auto flex items-center space-x-4">
+            <div className="flex items-center gap-2">
+              <Input
+                placeholder="Search..."
+                value={filters.searchQuery}
+                onChange={(e) =>
+                  setFilters({ ...filters, searchQuery: e.target.value })
+                }
+                className="w-[200px]"
+              />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="gap-2">
+                    <Filter className="h-4 w-4" />
+                    Filters
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56">
+                  <div className="p-2">
+                    <div className="mb-4">
+                      <label className="text-sm font-medium">Countries</label>
+                      {countries.map((country) => (
+                        <DropdownMenuCheckboxItem
+                          key={country.value}
+                          checked={filters.countries.includes(country.value)}
+                          onCheckedChange={(checked) => {
+                            setFilters({
+                              ...filters,
+                              countries: checked
+                                ? [...filters.countries, country.value]
+                                : filters.countries.filter(
+                                    (c) => c !== country.value
+                                  ),
+                            });
+                          }}
+                        >
+                          {country.label}
+                        </DropdownMenuCheckboxItem>
+                      ))}
+                    </div>
+                    <div className="mb-2">
+                      <label className="text-sm font-medium">Departments</label>
+                      {departments.map((dept) => (
+                        <DropdownMenuCheckboxItem
+                          key={dept.value}
+                          checked={filters.departments.includes(dept.value)}
+                          onCheckedChange={(checked) => {
+                            setFilters({
+                              ...filters,
+                              departments: checked
+                                ? [...filters.departments, dept.value]
+                                : filters.departments.filter(
+                                    (d) => d !== dept.value
+                                  ),
+                            });
+                          }}
+                        >
+                          {dept.label}
+                        </DropdownMenuCheckboxItem>
+                      ))}
+                    </div>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            <DatePickerWithRange date={date} setDate={setDate} />
+            <Button variant="default">Export Data</Button>
+          </div>
         </div>
-      </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {statsCards.map((card) => (
-          <Card key={card.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {card.title}
-              </CardTitle>
-              <card.icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{card.value}</div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="w-full justify-start h-[48px] px-4 bg-muted/50">
+            <TabsTrigger
+              value="overview"
+              className="data-[state=active]:bg-background"
+            >
+              Overview
+            </TabsTrigger>
+            <TabsTrigger
+              value="analytics"
+              className="data-[state=active]:bg-background"
+            >
+              Analytics
+            </TabsTrigger>
+            <TabsTrigger
+              value="reports"
+              className="data-[state=active]:bg-background"
+            >
+              Reports
+            </TabsTrigger>
+            <TabsTrigger
+              value="notifications"
+              className="data-[state=active]:bg-background"
+            >
+              Notifications
+            </TabsTrigger>
+          </TabsList>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <ChartBar />
-        <ChartLine />
-        <ChartArea />
-        <ChartPie />
+          <TabsContent value="overview" className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold">Dashboard Overview</h2>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">
+                  Compare to:
+                </span>
+                <Select defaultValue="previous-month">
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select period" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="previous-month">
+                      Previous Month
+                    </SelectItem>
+                    <SelectItem value="previous-year">Previous Year</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Stats Cards */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {statsCards.map((card) => (
+                <Card key={card.title}>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      {card.title}
+                    </CardTitle>
+                    <card.icon className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{card.value}</div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Charts Grid */}
+            <div className="grid gap-4 md:grid-cols-2 mt-6">
+              <ChartBar />
+              <ChartLine />
+              <ChartArea />
+              <ChartPie />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="p-6">
+            <DataTable filters={filters} />
+          </TabsContent>
+
+          <TabsContent value="reports" className="p-6">
+            <h2>Reports Content</h2>
+          </TabsContent>
+
+          <TabsContent value="notifications" className="p-6">
+            <h2>Notifications Content</h2>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
