@@ -22,7 +22,7 @@ import {
 interface DatePickerWithRangeProps {
   className?: string;
   date: { from: Date; to: Date };
-  setDate: React.Dispatch<React.SetStateAction<{ from: Date; to: Date }>>;
+  setDate: (value: { from: Date; to: Date } | ((prevState: { from: Date; to: Date }) => { from: Date; to: Date })) => void;
   timeRange?: string;
   setTimeRange?: (value: string) => void;
   timeRanges?: Array<{ value: string; label: string }>;

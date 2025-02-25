@@ -3,21 +3,13 @@
 import { useDashboard } from "@/hooks/use-dashboard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-
 import { ChartQueriesPerRegion } from "@/components/shared/chart-queries-per-region";
 import { ChartQueriesPerUser } from "@/components/shared/chart-queries-per-user";
 import { ChartQueriesPerGBGF } from "@/components/shared/chart-queries-per-GBGF";
-import { Button } from "@/components/ui/button";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { addDays } from "date-fns";
-import { Filter } from "lucide-react";
-import { useState } from "react";
+
+import { addDays, format } from "date-fns";
+import { useEffect, useState } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -30,20 +22,6 @@ import { ChartLLMCost } from "@/components/shared/chart-llm-cost";
 import { ChartLLMResponseTime } from "@/components/shared/chart-llm-response-time";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
-const countries = [
-  { value: "HK", label: "Hong Kong" },
-  { value: "UK", label: "United Kingdom" },
-  { value: "SG", label: "Singapore" },
-  { value: "ARG", label: "Argentina" },
-];
-
-const departments = [
-  { value: "ASP", label: "ASP" },
-  { value: "CIO", label: "CIO" },
-  { value: "CTO", label: "CTO" },
-  { value: "FBI", label: "FBI" },
-];
 
 const timeRanges = [
   { value: "5m", label: "5 min" },
@@ -58,8 +36,6 @@ const timeRanges = [
 ];
 
 export default function DashboardPage() {
-  const { data, isLoading, isError } = useDashboard();
-  
   const [date, setDate] = useState({
     from: new Date(),
     to: addDays(new Date(), 7),
@@ -72,12 +48,36 @@ export default function DashboardPage() {
     searchQuery: "",
   });
 
-  const [tempFilters, setTempFilters] = useState({
-    countries: [] as string[],
-    departments: [] as string[],
+  // 从日期范围转换为API需要的字符串格式
+  const formatDateParam = (date: Date) => {
+    return format(date, "yyyy-MM-dd");
+  };
+
+  // 使用时间范围和日期筛选调用 API
+  const { data, isLoading, isError, mutate } = useDashboard({
+    timeRange: filters.timeRange,
+    from: date.from ? formatDateParam(date.from) : undefined,
+    to: date.to ? formatDateParam(date.to) : undefined,
   });
 
-  const [open, setOpen] = useState(false);
+  // 当日期或时间范围变化时触发刷新
+  const handleDateChange = (newDate: { from: Date; to: Date } | ((prevState: { from: Date; to: Date }) => { from: Date; to: Date })) => {
+    if (typeof newDate === 'function') {
+      setDate(newDate);
+    } else {
+      setDate(newDate);
+    }
+  };
+
+  const handleTimeRangeChange = (value: string) => {
+    setFilters({ ...filters, timeRange: value });
+  };
+
+  // 监听日期和时间范围变化，触发数据刷新
+  useEffect(() => {
+    // 日期或时间范围变化时刷新数据
+    mutate();
+  }, [date.from, date.to, filters.timeRange, mutate]);
 
   if (isLoading) {
     return <DashboardSkeleton />;
@@ -87,19 +87,7 @@ export default function DashboardPage() {
     return <DashboardError />;
   }
 
-  const {
-    summary,
-    charts
-  } = data!;
-
-  const handleApplyFilters = () => {
-    setFilters((prev) => ({
-      ...prev,
-      countries: tempFilters.countries,
-      departments: tempFilters.departments,
-    }));
-    setOpen(false);
-  };
+  const { summary } = data!;
 
   const statsCards = [
     {
@@ -124,7 +112,7 @@ export default function DashboardPage() {
     },
     {
       title: "Average Star Rating Score",
-      value: summary.avgStarRating.toString(),
+      value: (Math.min(5, Math.max(0, summary.avgStarRating))).toFixed(2),
     },
   ];
 
@@ -137,93 +125,13 @@ export default function DashboardPage() {
             <div className="flex items-center gap-2">
               <DatePickerWithRange 
                 date={date} 
-                setDate={setDate} 
+                setDate={handleDateChange} 
                 timeRange={filters.timeRange}
-                setTimeRange={(value) => setFilters({ ...filters, timeRange: value })}
+                setTimeRange={handleTimeRangeChange}
                 timeRanges={timeRanges}
               />
-              <DropdownMenu open={open} onOpenChange={setOpen}>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="gap-2">
-                    <Filter className="h-4 w-4" />
-                    {(filters.countries.length > 0 ||
-                      filters.departments.length > 0) && (
-                      <span className="rounded-full bg-primary w-2 h-2" />
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56">
-                  <div className="p-2">
-                    <div className="mb-4">
-                      <label className="text-sm font-medium">Countries</label>
-                      {countries.map((country) => (
-                        <DropdownMenuCheckboxItem
-                          key={country.value}
-                          checked={tempFilters.countries.includes(
-                            country.value
-                          )}
-                          onCheckedChange={(checked) => {
-                            setTempFilters((prev) => ({
-                              ...prev,
-                              countries: checked
-                                ? [...prev.countries, country.value]
-                                : prev.countries.filter(
-                                    (c) => c !== country.value
-                                  ),
-                            }));
-                          }}
-                        >
-                          {country.label}
-                        </DropdownMenuCheckboxItem>
-                      ))}
-                    </div>
-                    <div className="mb-4">
-                      <label className="text-sm font-medium">Departments</label>
-                      {departments.map((dept) => (
-                        <DropdownMenuCheckboxItem
-                          key={dept.value}
-                          checked={tempFilters.departments.includes(dept.value)}
-                          onCheckedChange={(checked) => {
-                            setTempFilters((prev) => ({
-                              ...prev,
-                              departments: checked
-                                ? [...prev.departments, dept.value]
-                                : prev.departments.filter(
-                                    (d) => d !== dept.value
-                                  ),
-                            }));
-                          }}
-                        >
-                          {dept.label}
-                        </DropdownMenuCheckboxItem>
-                      ))}
-                    </div>
-                    <div className="flex justify-end gap-2 mt-4 border-t pt-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setTempFilters({ countries: [], departments: [] });
-                          setFilters((prev) => ({
-                            ...prev,
-                            countries: [],
-                            departments: [],
-                          }));
-                          setOpen(false);
-                        }}
-                      >
-                        Clear
-                      </Button>
-                      <Button size="sm" onClick={handleApplyFilters}>
-                        Apply
-                      </Button>
-                    </div>
-                  </div>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
           </div>
-
         </div>
 
         {/* Stats Cards */}
@@ -402,9 +310,7 @@ export function DashboardSkeleton() {
         {/* filter menu */}
         <div className="flex h-16 items-center mb-4">
           <div className="flex items-center gap-2">
-            <div className="h-10 w-[240px] rounded-md bg-muted animate-pulse" />
-            <div className="h-10 w-[120px] rounded-md bg-muted animate-pulse" />
-            <div className="h-10 w-10 rounded-md bg-muted animate-pulse" />
+            <div className="h-10 w-[360px] rounded-md bg-muted animate-pulse" />
           </div>
         </div>
 
