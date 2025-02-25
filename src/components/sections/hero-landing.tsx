@@ -1,7 +1,6 @@
 "use client";
 
-import { siteConfig } from "@/config/site";
-import { cn, nFormatter } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import Link from "@/components/link/link";
 import { Icons } from "@/components/shared/icons";
@@ -23,7 +22,7 @@ export default function HeroLanding() {
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           <span className=" font-extrabold">
-            A powerful portal for GenAI platform :{/* <span> */}
+            A powerful portal for GenAI platform :
             <span className="bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 bg-clip-text text-transparent">
               {" Admin Portal"}
             </span>
@@ -48,7 +47,7 @@ export default function HeroLanding() {
         >
           <Link
             href={`/dashboard`}
-            // prefetch={true}
+            prefetch={true}
             className={cn(
               buttonVariants({ size: "lg", rounded: "full" }),
               "gap-2"
@@ -56,24 +55,6 @@ export default function HeroLanding() {
           >
             <span>Start</span>
             <Icons.arrowRight className="size-4" />
-          </Link>
-          <Link
-            href={siteConfig.links.github}
-            target="_blank"
-            rel="noreferrer"
-            className={cn(
-              buttonVariants({
-                variant: "outline",
-                size: "lg",
-                rounded: "full",
-              }),
-              "px-5"
-            )}
-          >
-            <Icons.gitHub className="mr-2 size-4" />
-            <p>
-              <span className="hidden sm:inline-block"></span> GitHub
-            </p>
           </Link>
         </motion.div>
       </div>

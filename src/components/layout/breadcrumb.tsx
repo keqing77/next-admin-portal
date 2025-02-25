@@ -14,6 +14,13 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import Link from "../link/link";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const breadcrumbMap: Record<string, string> = {
   dashboard: "Dashboard",
@@ -23,6 +30,16 @@ const breadcrumbMap: Record<string, string> = {
   settings: "Settings",
 };
 
+interface Project {
+  id: string;
+  name: string;
+}
+
+const projects: Project[] = [
+  { id: "rmc", name: "RMC" },
+  { id: "ask", name: "Ask" },
+];
+
 export const DynamicBreadcrumb = () => {
   const pathname = usePathname();
   const paths = pathname.split("/").filter(Boolean);
@@ -30,6 +47,19 @@ export const DynamicBreadcrumb = () => {
   return (
     <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
       <SidebarTrigger />
+      <Separator orientation="vertical" className="mr-2 h-4" />
+      <Select defaultValue="rmc">
+        <SelectTrigger className="w-[140px]">
+          <SelectValue placeholder="Select project" />
+        </SelectTrigger>
+        <SelectContent>
+          {projects.map((project) => (
+            <SelectItem key={project.id} value={project.id}>
+              {project.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       <Separator orientation="vertical" className="mr-2 h-4" />
       <Breadcrumb className="flex items-center">
         {paths.map((path, index) => (

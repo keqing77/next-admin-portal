@@ -1,7 +1,36 @@
-import type { Icon } from "lucide-react";
-
 import { Icons } from "@/components/shared/icons";
-import exp from "constants";
+
+export interface DashboardData {
+  summary: {
+    totalQueries: number;
+    avgTimeTaken: string;
+    totalTimeSaved: string;
+    totalErratic: number;
+    totalExceedThreshold: number;
+    avgStarRating: number;
+    roi: number;
+    platformCost: number;
+    totalCostSavings: number;
+  };
+  charts: {
+    queriesPerRegion: Array<{
+      date: string;
+      totalQueries: number;
+      avgQueries: number;
+      regions: {
+        UK: number;
+        HK: number;
+        SG: number;
+        CHN: number;
+      };
+    }>;
+    queriesPerUser: Array<{ date: string; value: number }>;
+    queriesPerGBGF: Array<{ date: string; value: number }>;
+    timeSavedByRequestType: Array<{ date: string; value: number }>;
+    llmCost: Array<{ date: string; value: number }>;
+    llmResponseTime: Array<{ date: string; value: number }>;
+  };
+} 
 
 export type User = {
   id: string;
