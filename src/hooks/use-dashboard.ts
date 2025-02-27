@@ -2,40 +2,43 @@ import useSWR from "swr";
 import { fetcher } from "@/lib/utils";
 import type { DashboardData } from "@/types";
 
+function formatSeconds(seconds: number): string {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = Math.floor(seconds % 60);
+
+  const paddedSeconds = remainingSeconds.toString().padStart(2, '0');
+  const paddedMinutes = minutes.toString().padStart(2, '0');
+
+  if (hours > 0) {
+    return `${hours}h:${paddedMinutes}m:${paddedSeconds}s`;
+  }
+  
+  return `${minutes}m:${paddedSeconds}s`;
+}
+
 interface DashboardParams {
   timeRange?: string;
   from?: string;
   to?: string;
-  countries?: string[];
-  departments?: string[];
-  searchQuery?: string;
+  countries?: string;
+  departments?: string;
 }
 
 export function useDashboard(params: DashboardParams = {}) {
-  // 构建查询字符串
   const queryParams = new URLSearchParams();
-  
   if (params.timeRange) queryParams.set('timeRange', params.timeRange);
-  if (params.from) queryParams.set('from', params.from);
-  if (params.to) queryParams.set('to', params.to);
-  if (params.countries && params.countries.length) 
-    queryParams.set('countries', params.countries.join(','));
-  if (params.departments && params.departments.length) 
-    queryParams.set('departments', params.departments.join(','));
-  if (params.searchQuery) queryParams.set('query', params.searchQuery);
   
   const queryString = queryParams.toString();
   const url = `/api/dashboard${queryString ? `?${queryString}` : ''}`;
   
-  const { data, error, isLoading, mutate } = useSWR<DashboardData>(
-    url,
-    fetcher
-  );
+  const { data, error, isLoading, mutate } = useSWR<DashboardData>(url, fetcher);
 
   return {
     data,
     isLoading,
     isError: error,
-    mutate
+    mutate,
+    formatSeconds
   };
 } 

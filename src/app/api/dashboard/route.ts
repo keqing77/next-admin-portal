@@ -1,189 +1,126 @@
 import { NextRequest, NextResponse } from "next/server";
-import { addDays, subDays, format, differenceInDays } from 'date-fns';
+import { format } from 'date-fns';
+
+interface GBGFData {
+  ASP: number;
+  BSP: number;
+  CSP: number;
+  FIN: number;
+}
 
 interface RegionData {
+  UK: number;
+  HK: number;
+  SG: number;
+  CHN: number;
+}
+
+interface QueryData {
   date: string;
   totalQueries: number;
   avgQueries: number;
-  regions: {
-    UK: number;
-    HK: number;
-    SG: number;
-    CHN: number;
+  regions: RegionData;
+  GBGF: GBGFData;
+}
+
+interface TimeSavedData {
+  total: number;
+  avg: number;
+  types: {
+    Issues: number;
+    "Root Causes": number;
+    Actions: number;
+    Controls: number;
   };
 }
 
-interface TimeSeriesData {
+interface LLMCostData {
   date: string;
-  value: number;
+  total: number;
+  avg: number;
+  country: RegionData;
+  GBGF: GBGFData;
 }
 
-interface DashboardResponse {
-  summary: {
-    totalQueries: number;
-    avgTimeTaken: string;
-    totalTimeSaved: string;
-    totalErratic: number;
-    totalExceedThreshold: number;
-    avgStarRating: number;
-    roi: number;
-    platformCost: number;
-    totalCostSavings: number;
-  };
-  charts: {
-    queriesPerRegion: RegionData[];
-    queriesPerUser: TimeSeriesData[];
-    queriesPerGBGF: TimeSeriesData[];
-    timeSavedByRequestType: TimeSeriesData[];
-    llmCost: TimeSeriesData[];
-    llmResponseTime: TimeSeriesData[];
-  };
+function generateRandomNumber(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// 获取日期范围
-function getDateRange(timeRange: string, fromDate?: string, toDate?: string) {
-  const to = toDate ? new Date(toDate) : new Date();
-  let from = fromDate ? new Date(fromDate) : new Date();
-  
-  if (!fromDate) {
-    // 如果没有明确的 fromDate，则使用 timeRange 计算
-    switch (timeRange) {
-      case "5m":
-        from = new Date(to.getTime() - 5 * 60 * 1000);
-        break;
-      case "30m":
-        from = new Date(to.getTime() - 30 * 60 * 1000);
-        break;
-      case "1h":
-        from = new Date(to.getTime() - 60 * 60 * 1000);
-        break;
-      case "3h":
-        from = new Date(to.getTime() - 3 * 60 * 60 * 1000);
-        break;
-      case "24h":
-        from = subDays(to, 1);
-        break;
-      case "7d":
-        from = subDays(to, 7);
-        break;
-      case "1M":
-        from = new Date(to);
-        from.setMonth(from.getMonth() - 1);
-        break;
-      case "3M":
-        from = new Date(to);
-        from.setMonth(from.getMonth() - 3);
-        break;
-      case "1y":
-        from = new Date(to);
-        from.setFullYear(from.getFullYear() - 1);
-        break;
-      default:
-        from = subDays(to, 7); // 默认为7天
+function generateQueryData(date: string): QueryData {
+  return {
+    date,
+    totalQueries: generateRandomNumber(150, 400),
+    avgQueries: generateRandomNumber(40, 100),
+    regions: {
+      UK: generateRandomNumber(10, 90),
+      HK: generateRandomNumber(50, 100),
+      SG: generateRandomNumber(15, 90),
+      CHN: generateRandomNumber(50, 120)
+    },
+    GBGF: {
+      ASP: generateRandomNumber(100, 250),
+      BSP: generateRandomNumber(20, 50),
+      CSP: generateRandomNumber(10, 50),
+      FIN: generateRandomNumber(10, 100)
     }
-  }
-  
-  return { from, to };
+  };
 }
 
-// 生成指定日期范围内的时间序列数据
-function generateTimeSeriesData(from: Date, to: Date, minValue = 100, maxValue = 1000) {
-  const days = Math.max(1, differenceInDays(to, from) + 1);
-  const step = days <= 7 ? 1 : days <= 30 ? 3 : 7; // 根据时间范围调整数据点密度
-  
-  const result: TimeSeriesData[] = [];
-  for (let i = 0; i < days; i += step) {
-    const currentDate = addDays(new Date(from), i);
-    if (currentDate > to) break;
-    
-    result.push({
-      date: format(currentDate, 'yyyy-MM-dd'),
-      value: Math.floor(Math.random() * (maxValue - minValue)) + minValue,
-    });
-  }
-  
-  return result;
-}
-
-// 生成区域数据
-function generateRegionData(from: Date, to: Date) {
-  const days = Math.max(1, differenceInDays(to, from) + 1);
-  const step = days <= 7 ? 1 : days <= 30 ? 3 : 7;
-  
-  const result: RegionData[] = [];
-  for (let i = 0; i < days; i += step) {
-    const currentDate = addDays(new Date(from), i);
-    if (currentDate > to) break;
-    
-    const ukValue = Math.floor(Math.random() * 100) + 50;
-    const hkValue = Math.floor(Math.random() * 100) + 40;
-    const sgValue = Math.floor(Math.random() * 100) + 30;
-    const chnValue = Math.floor(Math.random() * 100) + 20;
-    const totalQueries = ukValue + hkValue + sgValue + chnValue;
-    
-    result.push({
-      date: format(currentDate, 'yyyy-MM-dd'),
-      totalQueries,
-      avgQueries: Math.floor(totalQueries / 4),
-      regions: {
-        UK: ukValue,
-        HK: hkValue,
-        SG: sgValue,
-        CHN: chnValue
-      }
-    });
-  }
-  
-  return result;
+function generateLLMCostData(date: string): LLMCostData {
+  return {
+    date,
+    total: generateRandomNumber(1500, 2000),
+    avg: generateRandomNumber(350, 450),
+    country: {
+      UK: generateRandomNumber(100, 350),
+      HK: generateRandomNumber(100, 500),
+      SG: generateRandomNumber(100, 350),
+      CHN: generateRandomNumber(100, 600)
+    },
+    GBGF: {
+      ASP: generateRandomNumber(150, 350),
+      BSP: generateRandomNumber(100, 500),
+      CSP: generateRandomNumber(100, 350),
+      FIN: generateRandomNumber(100, 600)
+    }
+  };
 }
 
 export async function GET(request: NextRequest) {
   // 模拟API延迟
   await new Promise(resolve => setTimeout(resolve, 500));
   
-  // 获取查询参数
-  const searchParams = request.nextUrl.searchParams;
-  const timeRange = searchParams.get('timeRange') || '24h';
-  const fromDate = searchParams.get('from') || undefined;
-  const toDate = searchParams.get('to') || undefined;
-  const countries = searchParams.get('countries')?.split(',') || [];
-  const departments = searchParams.get('departments')?.split(',') || [];
-  const query = searchParams.get('query') || '';
+  const dates = ["2025-02-24", "2025-02-25", "2025-02-26"];
   
-  // 计算日期范围
-  const { from, to } = getDateRange(timeRange, fromDate, toDate);
-  
-  // 根据日期范围生成数据
-  const queriesPerRegion = generateRegionData(from, to);
-  const queriesPerUser = generateTimeSeriesData(from, to, 200, 800);
-  const queriesPerGBGF = generateTimeSeriesData(from, to, 150, 600);
-  const timeSavedByRequestType = generateTimeSeriesData(from, to, 100, 500);
-  const llmCost = generateTimeSeriesData(from, to, 10, 50);
-  const llmResponseTime = generateTimeSeriesData(from, to, 300, 800);
-  
-  // 计算总查询数
-  const totalQueries = queriesPerRegion.reduce((sum, day) => sum + day.totalQueries, 0);
-  
-  // 创建响应数据
-  const dashboardData: DashboardResponse = {
-    summary: {
-      totalQueries,
-      avgTimeTaken: "1m:35s",
-      totalTimeSaved: `${Math.floor(totalQueries / 12)}h:${Math.floor(totalQueries / 60) % 60}m:${totalQueries % 60}s`,
-      totalErratic: Math.floor(totalQueries * 0.01), // 1%的错误率
-      totalExceedThreshold: Math.floor(totalQueries * 0.05), // 5%超过阈值
-      avgStarRating: 3 + Math.random() * 2, // 3-5之间的评分
-      roi: 0.2 + Math.random() * 0.5, // 0.2-0.7之间的ROI
+  const dashboardData = {
+    cards: {
+      totalQueries: generateRandomNumber(1000, 1200),
+      avgTimeTaken: generateRandomNumber(90, 100),
+      totalTimeSaved: generateRandomNumber(300000, 350000),
+      totalErratic: generateRandomNumber(8, 12),
+      totalExceedThreshold: generateRandomNumber(50, 60),
+      avgStarRating: 4 + Math.random(),
+      roi: 0.3 + Math.random() * 0.1,
       platformCost: 100000,
-      totalCostSavings: 20000 + Math.floor(Math.random() * 80000), // 2-10万之间
+      totalCostSavings: generateRandomNumber(25000, 35000)
     },
     charts: {
-      queriesPerRegion,
-      queriesPerUser,
-      queriesPerGBGF,
-      timeSavedByRequestType,
-      llmCost,
-      llmResponseTime,
+      queries: dates.map(date => generateQueryData(date)),
+      timeSaved: [{
+        total: generateRandomNumber(90, 120),
+        avg: generateRandomNumber(20, 30),
+        types: {
+          Issues: generateRandomNumber(40, 60),
+          "Root Causes": generateRandomNumber(15, 25),
+          Actions: generateRandomNumber(10, 20),
+          Controls: generateRandomNumber(10, 20)
+        }
+      }],
+      llmCost: dates.map(date => generateLLMCostData(date)),
+      llmResponseTime: dates.map(date => ({
+        date,
+        value: generateRandomNumber(500, 800)
+      }))
     }
   };
 

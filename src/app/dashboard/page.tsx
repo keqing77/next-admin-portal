@@ -2,11 +2,12 @@
 
 import { useDashboard } from "@/hooks/use-dashboard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-import { ChartQueriesPerRegion } from "@/components/shared/chart-queries-per-region";
-import { ChartQueriesPerUser } from "@/components/shared/chart-queries-per-user";
-import { ChartQueriesPerGBGF } from "@/components/shared/chart-queries-per-GBGF";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Filter } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 import { addDays, format } from "date-fns";
 import { useEffect, useState } from "react";
@@ -17,36 +18,18 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Rating } from "@/components/ui/rating";
-import { ChartTimeSavedByRequestType } from "@/components/shared/chart-time-saved-by-request-type";
-import { ChartLLMCost } from "@/components/shared/chart-llm-cost";
-import { ChartLLMResponseTime } from "@/components/shared/chart-llm-response-time";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
-const timeRanges = [
-  { value: "5m", label: "5 min" },
-  { value: "30m", label: "30 min" },
-  { value: "1h", label: "1 hour" },
-  { value: "3h", label: "3 hour" },
-  { value: "24h", label: "24 hour" },
-  { value: "7d", label: "7 days" },
-  { value: "1M", label: "1 month" },
-  { value: "3M", label: "3 months" },
-  { value: "1y", label: "1 year" },
-];
+import { QueriesChart } from "@/components/dashboard/charts/queries-chart";
+import { TimeSavedChart } from "@/components/dashboard/charts/time-saved-chart";
+import { LLMCostChart } from "@/components/dashboard/charts/llm-cost-chart";
+import { ResponseTimeChart } from "@/components/dashboard/charts/response-time-chart";
+import { FilterButton } from "@/components/shared/filter-button";
+import type { Filters } from "@/types/filters";
+import { useFilterStore } from "@/store/filter";
 
 export default function DashboardPage() {
-  const [date, setDate] = useState({
-    from: new Date(),
-    to: addDays(new Date(), 7),
-  });
-
-  const [filters, setFilters] = useState({
-    timeRange: "24h",
-    countries: [] as string[],
-    departments: [] as string[],
-    searchQuery: "",
-  });
+  const { startTime, endTime, countries, gbgfs, setDateRange } = useFilterStore()
 
   // 从日期范围转换为API需要的字符串格式
   const formatDateParam = (date: Date) => {
@@ -54,30 +37,16 @@ export default function DashboardPage() {
   };
 
   // 使用时间范围和日期筛选调用 API
-  const { data, isLoading, isError, mutate } = useDashboard({
-    timeRange: filters.timeRange,
-    from: date.from ? formatDateParam(date.from) : undefined,
-    to: date.to ? formatDateParam(date.to) : undefined,
+  const { data, isLoading, isError, formatSeconds, mutate } = useDashboard({
+    from: formatDateParam(startTime),
+    to: formatDateParam(endTime),
+    countries: countries.join(','),
+    gbgfs: gbgfs.join(',')
   });
 
-  // 当日期或时间范围变化时触发刷新
-  const handleDateChange = (newDate: { from: Date; to: Date } | ((prevState: { from: Date; to: Date }) => { from: Date; to: Date })) => {
-    if (typeof newDate === 'function') {
-      setDate(newDate);
-    } else {
-      setDate(newDate);
-    }
-  };
-
-  const handleTimeRangeChange = (value: string) => {
-    setFilters({ ...filters, timeRange: value });
-  };
-
-  // 监听日期和时间范围变化，触发数据刷新
   useEffect(() => {
-    // 日期或时间范围变化时刷新数据
     mutate();
-  }, [date.from, date.to, filters.timeRange, mutate]);
+  }, [startTime, endTime, countries, gbgfs, mutate]);
 
   if (isLoading) {
     return <DashboardSkeleton />;
@@ -87,32 +56,32 @@ export default function DashboardPage() {
     return <DashboardError />;
   }
 
-  const { summary } = data!;
+  const { cards, charts } = data!;
 
   const statsCards = [
     {
       title: "Total Queries Processed",
-      value: summary.totalQueries.toLocaleString(),
+      value: cards.totalQueries.toLocaleString(),
     },
     {
       title: "Avg Time Taken by LLM",
-      value: summary.avgTimeTaken,
+      value: formatSeconds(cards.avgTimeTaken),
     },
     {
       title: "Total Time Saved",
-      value: summary.totalTimeSaved,
+      value: formatSeconds(cards.totalTimeSaved),
     },
     {
       title: "Total Erratic Reported",
-      value: summary.totalErratic.toString(),
+      value: cards.totalErratic.toString(),
     },
     {
       title: "Total Requests exceed Thresholds",
-      value: summary.totalExceedThreshold.toString(),
+      value: cards.totalExceedThreshold.toString(),
     },
     {
       title: "Average Star Rating Score",
-      value: (Math.min(5, Math.max(0, summary.avgStarRating))).toFixed(2),
+      value: (Math.min(5, Math.max(0, cards.avgStarRating))).toFixed(2),
     },
   ];
 
@@ -124,11 +93,17 @@ export default function DashboardPage() {
           <div className="flex items-center space-x-4">
             <div className="flex items-center gap-2">
               <DatePickerWithRange 
-                date={date} 
-                setDate={handleDateChange} 
-                timeRange={filters.timeRange}
-                setTimeRange={handleTimeRangeChange}
-                timeRanges={timeRanges}
+                date={{ from: startTime, to: endTime }}
+                onSelect={(range) => {
+                  if(range?.from && range?.to) {
+                    setDateRange(range.from, range.to)
+                  }
+                }}
+              />
+              <FilterButton 
+                countries={countries}
+                gbgfs={gbgfs}
+                onApply={mutate}
               />
             </div>
           </div>
@@ -139,7 +114,7 @@ export default function DashboardPage() {
           {statsCards.map((card) => (
             <Card 
               key={card.title} 
-              className="overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/20"
+              className="overflow-hidden transition-all duration-200 hover:cursor-pointer hover:shadow-lg hover:border-primary/20"
             >
               <CardHeader className="space-y-0 pb-2">
                 <TooltipProvider delayDuration={200}>
@@ -195,9 +170,10 @@ export default function DashboardPage() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mt-4 flex-1">
-              <ChartQueriesPerRegion className="col-span-1 h-full" />
-              <ChartQueriesPerGBGF className="col-span-1 h-full" />
-              <ChartQueriesPerUser className="col-span-1 h-full" />
+               <QueriesChart 
+                 data={charts.queries} 
+                 className="col-span-full lg:col-span-3"
+               />
             </div>
           </div>
 
@@ -236,10 +212,10 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold bg-gradient-to-r from-primary/80 to-primary bg-clip-text text-transparent">
-                    {summary.roi.toFixed(2)}
+                    {cards.roi.toFixed(2)}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
-                    Platform Cost: {summary.platformCost.toLocaleString()}
+                    Platform Cost: {cards.platformCost.toLocaleString()}
                   </div>
                 </CardContent>
               </Card>
@@ -268,7 +244,7 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold bg-gradient-to-r from-primary/80 to-primary bg-clip-text text-transparent">
-                    {summary.totalCostSavings.toLocaleString()}
+                    {cards.totalCostSavings.toLocaleString()}
                   </div>
                 </CardContent>
               </Card>
@@ -276,7 +252,10 @@ export default function DashboardPage() {
 
             {/* Chart */}
             <div className="mt-4 flex-1">
-              <ChartTimeSavedByRequestType className="h-full" />
+              <TimeSavedChart 
+                data={charts.timeSaved} 
+                className="h-full"
+              />
             </div>
           </div>
         </section>
@@ -291,14 +270,20 @@ export default function DashboardPage() {
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-4">
-            <ChartQueriesPerRegion className="lg:col-span-2" />
-            <ChartLLMCost className="lg:col-span-1" />
-            <ChartLLMResponseTime className="lg:col-span-1" />
+            <LLMCostChart 
+              data={charts.llmCost}  
+              className="col-span-2"
+            />
+            <ResponseTimeChart 
+              data={charts.llmResponseTime} 
+              className="col-span-2"
+            />
           </div>
 
         </section>
 
       </div>
+
     </div>
   );
 }

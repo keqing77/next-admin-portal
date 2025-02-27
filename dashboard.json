@@ -1,0 +1,92 @@
+{
+    "cards": {
+        "totalQueries": 869,
+        "avgTimeTaken": 90, 
+        "totalTimeSaved": 37181, 
+        "totalErratic": 8,
+        "totalExceedThreshold": 43,
+        "avgStarRating": 4.588363742998186,
+        "roi": 0.5022989573510686,
+        "platformCost": 100000,
+        "totalCostSavings": 65016
+    },
+    "charts": {
+        "queries": [
+            {
+                "date": "2025-02-27",
+                "totalQueries": 253,
+                "avgQueries": 63,
+                "regions": {
+                    "UK": 66,
+                    "HK": 71,
+                    "SG": 36,
+                    "CHN": 80
+                }
+            },
+            {
+                "date": "2025-03-02",
+                "totalQueries": 313,
+                "avgQueries": 78,
+                "regions": {
+                    "UK": 113,
+                    "HK": 67,
+                    "SG": 74,
+                    "CHN": 59
+                }
+            },
+            {
+                "date": "2025-03-05",
+                "totalQueries": 303,
+                "avgQueries": 75,
+                "regions": {
+                    "UK": 56,
+                    "HK": 73,
+                    "SG": 76,
+                    "CHN": 98
+                }
+            }
+        ],
+        "timeSavedByRequestType": [
+            {
+                "date": "2025-02-27",
+                "value": 455
+            },
+            {
+                "date": "2025-03-02",
+                "value": 459
+            },
+            {
+                "date": "2025-03-05",
+                "value": 372
+            }
+        ],
+        "llmCost": [
+            {
+                "date": "2025-02-27",
+                "value": 45
+            },
+            {
+                "date": "2025-03-02",
+                "value": 43
+            },
+            {
+                "date": "2025-03-05",
+                "value": 36
+            }
+        ],
+        "llmResponseTime": [
+            {
+                "date": "2025-02-27",
+                "value": 592
+            },
+            {
+                "date": "2025-03-02",
+                "value": 353
+            },
+            {
+                "date": "2025-03-05",
+                "value": 657
+            }
+        ]
+    }
+}

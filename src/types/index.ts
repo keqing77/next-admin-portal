@@ -1,10 +1,11 @@
 import { Icons } from "@/components/shared/icons";
+import { UserRole } from "./user";
 
 export interface DashboardData {
-  summary: {
+  cards: {
     totalQueries: number;
-    avgTimeTaken: string;
-    totalTimeSaved: string;
+    avgTimeTaken: number; // in seconds
+    totalTimeSaved: number; // in seconds
     totalErratic: number;
     totalExceedThreshold: number;
     avgStarRating: number;
@@ -24,28 +25,13 @@ export interface DashboardData {
         CHN: number;
       };
     }>;
-    queriesPerUser: Array<{ date: string; value: number }>;
-    queriesPerGBGF: Array<{ date: string; value: number }>;
-    timeSavedByRequestType: Array<{ date: string; value: number }>;
+    queries: Array<{ date: string; value: number }>;
+    timeSaved: Array<{ date: string; value: number }>;
     llmCost: Array<{ date: string; value: number }>;
     llmResponseTime: Array<{ date: string; value: number }>;
   };
 } 
 
-export type User = {
-  id: string;
-  name: string;
-  email: string;
-  emailVerified: Date;
-  image: string;
-  createdAt: Date;
-  updatedAt: Date;
-  role: UserRole;
-  stripeCustomerId: string;
-  stripeSubscriptionId: string;
-  stripePriceId: string;
-  stripeCurrentPeriodEnd: Date;
-};
 
 export type SiteConfig = {
   name: string;
@@ -87,91 +73,4 @@ export type DocsConfig = {
   sidebarNav: SidebarNavItem[];
 };
 
-export type SubscriptionPlan = {
-  title: string;
-  description: string;
-  benefits: string[];
-  limitations: string[];
-  prices: {
-    monthly: number;
-    yearly: number;
-  };
-  stripeIds: {
-    monthly: string | null;
-    yearly: string | null;
-  };
-  quotas: {
-    type: QuotaResourceType;
-    totalQuota: number;
-    usedQuota: number;
-  }[];
-};
 
-export type UserSubscriptionPlan = SubscriptionPlan &
-  Pick<User, "stripeCustomerId" | "stripeSubscriptionId" | "stripePriceId"> & {
-    stripeCurrentPeriodEnd: number | null;
-    isPaid: boolean | null;
-    interval: "month" | "year" | null;
-    isCanceled?: boolean | null;
-    stripeSubscriptionId: string | null;
-    stripeCustomerId: string | null;
-    stripePriceId: string | null;
-  };
-
-// compare plans
-export type ColumnType = string | boolean | null;
-export type PlansRow = {
-  feature: string | null;
-  tooltip?: string | null;
-  starter?: boolean | null;
-  pro?: boolean | null;
-  business?: boolean | null;
-  enterprise?: string | null;
-} & {};
-
-// landing sections
-export type InfoList = {
-  icon: keyof typeof Icons;
-  title: string;
-  description: string;
-};
-
-export type InfoLdg = {
-  title: string;
-  image: string;
-  description: string;
-  list: InfoList[];
-};
-
-export type Features = {
-  icon: any;
-  title: string;
-  description: string;
-  link: string;
-};
-
-export type Feature = {
-  icon: string;
-  titleKey: string;
-  descriptionKey: string;
-};
-
-export interface TestimonialType {
-  id: string;
-  name: string;
-  job: string;
-  image: string;
-  review: string;
-}
-
-export enum UserRole {
-  ADMIN = "ADMIN",
-  USER = "USER",
-}
-
-export enum QuotaResourceType {
-  API_CALLS = "api_calls",
-  STORAGE = "storage",
-  EXPORTS = "exports",
-  TEAM_MEMBERS = "team_members",
-}
