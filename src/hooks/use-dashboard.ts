@@ -1,6 +1,6 @@
-import useSWR from "swr";
 import { fetcher } from "@/lib/utils";
 import type { DashboardData } from "@/types";
+import useSWR from "swr";
 
 function formatSeconds(seconds: number): string {
   const hours = Math.floor(seconds / 3600);
@@ -21,8 +21,8 @@ interface DashboardParams {
   timeRange?: string;
   from?: string;
   to?: string;
-  countries?: string;
-  departments?: string;
+  country?: string;
+  department?: string;
 }
 
 export function useDashboard(params: DashboardParams = {}) {
