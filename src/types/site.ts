@@ -27,7 +27,6 @@ export interface MenuItem {
 
 export interface SidebarMenuConfig {
   navHeader: NavHeader;
-  user: UserProfile;
   navMain: NavItem[];
   navWithoutItems: NavItem[];
 }

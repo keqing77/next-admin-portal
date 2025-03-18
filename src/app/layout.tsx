@@ -35,12 +35,14 @@ export default function RootLayout({
       >
         <ThemeProvider attribute="class" defaultTheme="system">
           <Toaster />
-          <div className="flex min-h-screen w-full">
+          <div className="relative flex min-h-screen w-full overflow-hidden">
             <SidebarProvider>
-              <AppSidebar />
-              <div className="flex-1 transition-all duration-300 w-full">
+              <div className="sticky left-0 top-0 h-screen">
+                <AppSidebar />
+              </div>
+              <div className="flex-1 overflow-auto">
                 <DynamicBreadcrumb />
-                <main className="p-6 w-full">{children}</main>
+                <main className="p-6">{children}</main>
               </div>
             </SidebarProvider>
           </div>

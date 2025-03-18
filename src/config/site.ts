@@ -5,6 +5,7 @@ import {
   Bot,
   Home,
   LogOut,
+  SquareTerminal,
   Users
 } from "lucide-react";
 
@@ -13,11 +14,6 @@ export const sidebarMenu: SidebarMenuConfig = {
     title: "Admin Portal",
     subtitle: "Platform",
     logo: "/logo.svg",
-  },
-  user: {
-    name: "System User",
-    email: "admin@example.com",
-    avatar: "/avatar.png",
   },
   navMain: [
     {
@@ -35,6 +31,22 @@ export const sidebarMenu: SidebarMenuConfig = {
       url: "/audit",
       icon: Users,
     },
+    {
+      title: "Model LifeCycle Management",
+      url: "#",
+      icon: SquareTerminal,
+      isActive: true,
+      items: [
+        {
+          title: "Prompt management",
+          url: "/registry",
+        },
+        {
+          title: "Template management",
+          url: "/deployment",
+        }
+      ]
+    }
   ],
   navWithoutItems: [],
 };

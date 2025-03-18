@@ -1,8 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, ArrowUpDown, CheckCircle2 } from "lucide-react";
+import { DatePickerWithRange } from "@/components/ui/date-range-picker";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -11,24 +16,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { DatePickerWithRange } from "@/components/ui/date-range-picker";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { subDays } from "date-fns";
+import { AlertCircle, ArrowUpDown, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
-import { mockData, MetricData } from "./mockData";
+import { useState } from "react";
 import { DateRange } from "react-day-picker";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { addDays, subDays } from "date-fns";
+import { mockData } from "./mockData";
 
 export default function MetricsPage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -267,6 +260,10 @@ export default function MetricsPage() {
               <TableHead>Accuracy (%)</TableHead>
               <TableHead>Completeness (%)</TableHead>
               <TableHead>Hallucination (%)</TableHead>
+              <TableHead>Context Relevance</TableHead>
+              <TableHead>Semantic Relevance</TableHead>
+              <TableHead>Consistency</TableHead>
+              <TableHead>Calculate</TableHead>
               <TableHead>Action</TableHead>
             </TableRow>
           </TableHeader>
