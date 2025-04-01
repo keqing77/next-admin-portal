@@ -1,20 +1,47 @@
+
 export enum UserRole {
-    ADMIN = "ADMIN",
-    USER = "USER",
+    Viewer = "Viewer",
+    Analyst = "Analyst",
+    Owner = "Owner",
+}
+
+export type UserPermission = 
+    | "mi.readonly"
+    | "mi.editor"
+    | "evaluation.readonly"
+    | "evaluation.editor"
+    | "lifecycle.readonly"
+    | "simulation.readonly"
+    | "simulation.editor";
+
+export const ALL_USER_PERMISSIONS: UserPermission[] = [
+    "mi.readonly",
+    "mi.editor",
+    "evaluation.readonly",
+    "evaluation.editor",
+    "lifecycle.readonly",
+    "simulation.readonly",
+    "simulation.editor",
+];
+
+export type AccessControlProps = {
+  userPermissions: UserPermission[];
+  allowPermissions: UserPermission[];
+  renderNoAccess: () => React.ReactNode;
+  children: React.ReactNode;
 }
 
 export type User = {
-    id: string;
+    id?: string;
     name: string;
-    email: string;
-    emailVerified: Date;
-    image: string;
-    createdAt: Date;
-    updatedAt: Date;
+    mail: string;
+    country?: string;
+    title: Date;
+    department?: string;
     role: UserRole;
-    stripeCustomerId: string;
-    stripeSubscriptionId: string;
-    stripePriceId: string;
-    stripeCurrentPeriodEnd: Date;
+    eim?: string;
+    lob?: string;
+    acl?: string;
+    photo?: string;
 };
   
