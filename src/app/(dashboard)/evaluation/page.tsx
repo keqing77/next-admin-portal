@@ -278,7 +278,7 @@ export default function MetricsPage() {
                 <TableRow key={row.requestId}>
                   <TableCell>
                     <Link
-                      href={`/dashboard/metrics/${row.requestId}`}
+                      href={`/src/app/(dashboard)/dashboard/metrics/${row.requestId}`}
                       className="text-blue-600 hover:underline"
                     >
                       {row.requestId}

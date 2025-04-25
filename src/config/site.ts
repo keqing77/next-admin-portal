@@ -18,7 +18,7 @@ export const sidebarMenu: SidebarMenuConfig = {
   navMain: [
     {
       title: "Dashboard",
-      url: "/",
+      url: "/dashboard",
       icon: Home,
     },
     {

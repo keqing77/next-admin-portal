@@ -2,6 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
@@ -18,16 +20,54 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { format, isValid, parse, subMonths } from "date-fns";
 import { CalendarIcon, Filter } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DateRange } from "react-day-picker";
 
 export const DashboardFilter = () => {
+  // 默认设置为三个月范围：今天到三个月前
   const [date, setDate] = useState<DateRange | undefined>({
-    from: new Date(new Date().setDate(new Date().getDate() - 7)),
+    from: subMonths(new Date(), 3),
     to: new Date(),
   });
+
+  // 字符串形式的日期，用于输入框
+  const [startDateStr, setStartDateStr] = useState("");
+  const [endDateStr, setEndDateStr] = useState("");
+
+  // 初始化和日期变化时更新字符串
+  useEffect(() => {
+    if (date?.from) {
+      setStartDateStr(format(date.from, "yyyy-MM-dd"));
+    }
+    if (date?.to) {
+      setEndDateStr(format(date.to, "yyyy-MM-dd"));
+    }
+  }, [date]);
+
+  // 处理输入框日期变化
+  const handleStartDateChange = (value: string) => {
+    setStartDateStr(value);
+    const parsed = parse(value, "yyyy-MM-dd", new Date());
+    if (isValid(parsed)) {
+      setDate((prev) => ({
+        from: parsed,
+        to: prev?.to,
+      }));
+    }
+  };
+
+  const handleEndDateChange = (value: string) => {
+    setEndDateStr(value);
+    const parsed = parse(value, "yyyy-MM-dd", new Date());
+    if (isValid(parsed)) {
+      setDate((prev) => ({
+        from: prev?.from,
+        to: parsed,
+      }));
+    }
+  };
 
   const [filters, setFilters] = useState({
     market: [],
@@ -65,12 +105,36 @@ export const DashboardFilter = () => {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
+              <div className="p-4 border-b">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="start-date">Start Date</Label>
+                    <Input
+                      id="start-date"
+                      type="date"
+                      value={startDateStr}
+                      onChange={(e) => handleStartDateChange(e.target.value)}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="end-date">End Date</Label>
+                    <Input
+                      id="end-date"
+                      type="date"
+                      value={endDateStr}
+                      onChange={(e) => handleEndDateChange(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
               <Calendar
                 initialFocus
                 mode="range"
                 defaultMonth={date?.from}
                 selected={date}
-                onSelect={setDate}
+                onSelect={(newRange) => {
+                  setDate(newRange);
+                }}
                 numberOfMonths={2}
               />
             </PopoverContent>
@@ -94,6 +158,8 @@ export const DashboardFilter = () => {
                 </div>
                 <Separator />
 
+                {/* 过滤选项，保持不变 */}
+                {/* ... 保持原始过滤器代码不变 ... */}
                 <div className="grid gap-2">
                   <div className="grid gap-1">
                     <Select>
